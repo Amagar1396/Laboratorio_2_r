@@ -1,0 +1,95 @@
+---
+Amabili Rosisabel Aguilón García
+3277836211101
+Practice test 2
+---
+
+```{r}
+library(nycflights13)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+
+
+View(flights)
+view(airports)
+view(planes)
+view(airlines)
+view(weather)
+```
+
+
+```{r}
+flights %>%
+  inner_join(planes, by="tailnum")
+```
+
+```{r}
+flights %>%
+  inner_join(airlines,by="carrier")
+```
+
+```{r}
+flights%>%
+      inner_join(airports, by = c( "origin" = "faa")) %>%
+  inner_join(airports, by=c("dest" = "faa"))
+```
+
+```{r}
+flights %>%
+  inner_join(weather,by=c("year","month", "day","hour","origin"))
+```
+
+```{r}
+flights %>%
+  count(year,month,day) %>%
+  filter(n > 1000) %>%
+  arrange(n)
+```
+
+```{r}
+flights_select <- flights [c(1:3,6,9,10,12,13,14,6)]
+
+flights_select
+```
+
+```{r}
+flights_select %>%
+  left_join(airlines, by ="carrier") %>%
+  select(-origin,-dest) %>%
+  mutate(tot_delay = arr_delay + dep_delay)
+```
+
+```{r}
+precip_delay <-flights %>%
+  inner_join(weather,by=c("year","month", "day","hour","origin")) %>%
+  group_by(precip) %>%
+  summarize(delay = mean(dep_delay, na.rm = TRUE))%>% 
+  replace_na(delay(x = 0, y = "N/A)
+  
+```
+
+```{r}
+ggplot(precip_delay, aes(x=precip, y=delay)) + geom_point()
+```
+
+```{r}
+flights_airports <- flights %>%
+  filter(year == 2013, month == 5, day == 10) %>%
+  group_by(dest) %>%
+  summarize(delay = mean(arr_delay, na.rm = TRUE)) %>%
+   inner_join(airports, by = c("dest" = "faa"))
+
+```
+
+```{r}
+ggplot(flights_airports, aes(x=lon, y=lat, color = delay, size = delay)) + geom_point()
+```
+
+```{r}
+flights %>%
+  inner_join(planes,by="tailnum", suffix= c("_flights","_planes")) %>%
+  transmute(tailnum, manufacturer, pi = (dep_delay + arr_delay)/air_time)
+
+```
+
